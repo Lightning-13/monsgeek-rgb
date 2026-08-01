@@ -1,15 +1,11 @@
 import hid
 
 from .protocol import create_static_color_packet
+from .devices import SUPPORTED_DEVICES
 
 
 class Keyboard:
     """MonsGeek RGB keyboard."""
-
-    VENDOR_ID = 0x3151
-    PRODUCT_ID = 0x5026
-    USAGE_PAGE = 0xFFFF
-    USAGE = 0x02
 
     def __init__(self):
         self.device = hid.device()
@@ -22,20 +18,33 @@ class Keyboard:
         self.device.open_path(self.path)
 
     def _find_device(self):
-        for d in hid.enumerate():
-            if (
-                d["vendor_id"] == self.VENDOR_ID
-                and d["product_id"] == self.PRODUCT_ID
-                and d["usage_page"] == self.USAGE_PAGE
-                and d["usage"] == self.USAGE
-            ):
-                return d["path"]
+        for hid_device in hid.enumerate():
+            for supported in SUPPORTED_DEVICES:
+                if (
+                    hid_device["vendor_id"] == supported["vendor_id"]
+                    and hid_device["product_id"] == supported["product_id"]
+                    and hid_device["usage_page"] == supported["usage_page"]
+                    and hid_device["usage"] == supported["usage"]
+                ):
+                    return hid_device["path"]
 
         return None
 
     def set_color(self, r, g, b):
         packet = create_static_color_packet(r, g, b)
         self.device.send_feature_report(packet)
+
+    def set_red(self):
+        self.set_color(255, 0, 0)
+
+    def set_green(self):
+        self.set_color(0, 255, 0)
+
+    def set_blue(self):
+        self.set_color(0, 0, 255)
+
+    def turn_off(self):
+        self.set_color(0, 0, 0)
 
     def close(self):
         self.device.close()
