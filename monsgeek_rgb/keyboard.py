@@ -1,6 +1,6 @@
 import hid
 
-from .protocol import create_static_color_packet
+from .protocol import create_static_color_packet, create_brightness_packet
 from .devices import SUPPORTED_DEVICES
 
 
@@ -48,3 +48,7 @@ class Keyboard:
 
     def close(self):
         self.device.close()
+
+    def set_brightness(self, level):
+        packet = create_brightness_packet(level)
+        self.device.send_feature_report(packet)  

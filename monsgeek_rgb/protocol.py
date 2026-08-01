@@ -28,3 +28,33 @@ def create_static_color_packet(r: int, g: int, b: int) -> bytes:
     packet[9] = calculate_checksum(packet[1:9])
 
     return bytes(packet)
+
+
+def create_brightness_packet(level: int) -> bytes:
+    """
+    Create a 65-byte HID Feature Report for brightness control.
+
+    Brightness levels:
+    0 = off
+    1 = low
+    2 = medium
+    3 = high
+    """
+
+    if not 0 <= level <= 3:
+        raise ValueError("Brightness level must be between 0 and 3.")
+
+    packet = bytearray(65)
+
+    packet[1] = 0x07
+    packet[2] = 0x01
+    packet[3] = 0x04
+    packet[4] = level
+    packet[5] = 0x08
+    packet[6] = 0xFF
+    packet[7] = 0x00
+    packet[8] = 0x00
+
+    packet[9] = calculate_checksum(packet[1:9])
+
+    return bytes(packet)
