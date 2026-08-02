@@ -57,4 +57,4 @@ def create_brightness_packet(level: int) -> bytes:
 
     packet[9] = calculate_checksum(packet[1:9])
 
-    return bytes(packet)
+    return bytes(packet) 
